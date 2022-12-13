@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Launch",
+            "program": "C:/Users/T9147282/Documents/Talpiot/SOS-WIFI/src/test.lua"
+        }
+    ]
+}
