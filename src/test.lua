@@ -3,5 +3,8 @@
 --- Created by T9147282.
 --- DateTime: 12/12/2022 22:17
 ---
-print("ido")
-Temp = 7
+ for i=0,10 do
+ print(i)
+ end
+ print("ido")
+
