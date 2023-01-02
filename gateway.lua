@@ -518,10 +518,10 @@ function ReportStatusGetUpdates(isPowerUp, isShutDown)
                 printToSOSlog (errorString) -- TODO debug remove
             end
             
-			if isShutDown then
-				con:close()
-				return
-			end
+		if isShutDown then
+			con:close()
+			return
+		end
 
             -- check parameters
             local group_id = ""
@@ -752,28 +752,16 @@ function CheckSystemOFF()
 			power_off = true
 		end
 		if (power_off) then
-			-- OLD implementation:
-			-- local off_minutes = glb_system_off_update_interval_minutes
-			-- if (now_min < glb_system_off_end_minute) then -- Option I, range A  or Option II, range C 
-			-- 	if ((glb_system_off_end_minute - now_min) < glb_system_off_update_interval_minutes) then
-			-- 		off_minutes = glb_system_off_end_minute - now_min
-			-- 	end
-			-- else -- now > start ==> only in Option I, range B 
-			-- 	if ((TOTAL_MINUTES_PER_DAY - now_min + glb_system_off_end_minute) < glb_system_off_update_interval_minutes) then
-			-- 		off_minutes = glb_system_off_end_minute - TOTAL_MINUTES_PER_DAY - now_min + glb_system_off_end_minute
-			-- 	end
-			-- end
-			-- NEW implementation:
-			-- 1/2/2021 - off time at GW is ALL off period (no intervals) + clock drift time (11 min/hour) + 10min spare
-			-- this is done since the GW, when it wakes up, has no internet connection and therefore doesn't know the correct time
-			-- and might go to off period wrongfully during the day.
-			-- default: midnight to off-end + (24H [=1440] - now)
-			local unadjusted_off_minutes = glb_system_off_end_minute + TOTAL_MINUTES_PER_DAY - now_min
+			local off_minutes = glb_system_off_update_interval_minutes
 			if (now_min < glb_system_off_end_minute) then -- Option I, range A  or Option II, range C 
-				unadjusted_off_minutes = glb_system_off_end_minute - now_min
+				if ((glb_system_off_end_minute - now_min) < glb_system_off_update_interval_minutes) then
+					off_minutes = glb_system_off_end_minute - now_min
+				end
+			else -- now > start ==> only in Option I, range B 
+				if ((TOTAL_MINUTES_PER_DAY - now_min + glb_system_off_end_minute) < glb_system_off_update_interval_minutes) then
+					off_minutes = glb_system_off_end_minute - TOTAL_MINUTES_PER_DAY - now_min + glb_system_off_end_minute
+				end
 			end
-			-- 0.845 = 60 / 71  --> 71 is 60+11,  the 10 at the end: extra time to make sure router is on
-		    local off_minutes = math.floor(0.5 + unadjusted_off_minutes*0.845) + 10
 			printToSOSlog("Power system off: now_min="..tostring(now_min).." start min="..tostring(glb_system_off_start_minute).." end min="..tostring(glb_system_off_end_minute).." off minutes="..tostring(off_minutes))
 			ReportStatusGetUpdates(false,true)
 			-- os.execute("echo \"1\" > /sys/class/gpio/gpio"..SYSTEM_POWER_CONTROL_GPIO.."/value");
